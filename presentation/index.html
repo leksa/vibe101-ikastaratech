@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Coding dengan Claude Code — Studi Kasus Dashboard SPPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1120; --panel:#0f172a; --panel-2:#1e293b; --line:#27354a;
+    --ink:#e8eef6; --muted:#93a3b8; --faint:#5d6b80;
+    --merah:#ef4444; --kuning:#eab308; --hijau:#22c55e;
+    --clay:#d97757; --clay-soft:#e89a82;
+    --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--body);
+    overflow:hidden; -webkit-font-smoothing:antialiased;
+  }
+  /* ambient grid */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:64px 64px; mask-image:radial-gradient(ellipse 80% 70% at 70% 30%,#000 30%,transparent 75%);
+    z-index:0;
+  }
+
+  .deck{position:fixed; inset:0; z-index:1}
+  .slide{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    padding:clamp(28px,5vw,84px); opacity:0; visibility:hidden;
+    transform:translateY(14px); transition:opacity .5s ease, transform .5s ease, visibility .5s;
+  }
+  .slide.active{opacity:1; visibility:visible; transform:none}
+  @media (prefers-reduced-motion:reduce){.slide{transition:opacity .2s}}
+
+  /* ---- shared bits ---- */
+  .eyebrow{
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--clay); display:flex; align-items:center; gap:.7rem;
+  }
+  .eyebrow::before{content:""; width:26px; height:1px; background:var(--clay); display:inline-block}
+  h1,h2{font-family:var(--display); font-weight:600; line-height:1.02; letter-spacing:-.02em}
+  h1{font-size:clamp(2.6rem,6.4vw,5.4rem)}
+  h2{font-size:clamp(1.9rem,3.8vw,3.1rem); margin-bottom:.2em}
+  p{color:var(--muted); line-height:1.6}
+  .lead{font-size:clamp(1rem,1.5vw,1.22rem); max-width:62ch}
+
+  /* coverage bar — the signature motif + progress */
+  .covbar{display:flex; gap:4px; height:8px; width:100%}
+  .covbar span{flex:1; border-radius:2px; background:var(--panel-2); transition:background .5s ease, box-shadow .5s ease}
+  .covbar span.lit-m{background:var(--merah)} .covbar span.lit-k{background:var(--kuning)} .covbar span.lit-h{background:var(--hijau)}
+
+  /* topbar */
+  .topbar{position:fixed; top:0; left:0; right:0; z-index:5; display:flex; align-items:center; gap:18px;
+    padding:18px clamp(28px,5vw,84px); pointer-events:none}
+  .brand{font-family:var(--mono); font-size:.72rem; letter-spacing:.2em; color:var(--faint); text-transform:uppercase; white-space:nowrap}
+  .topbar .covbar{height:5px}
+  .counter{font-family:var(--mono); font-size:.78rem; color:var(--muted); white-space:nowrap}
+  .counter b{color:var(--ink); font-weight:700}
+
+  /* footer nav */
+  .nav{position:fixed; bottom:0; right:0; z-index:5; display:flex; align-items:center; gap:14px; padding:18px clamp(28px,5vw,84px)}
+  .nav button{
+    font-family:var(--mono); font-size:.95rem; background:var(--panel); color:var(--muted);
+    border:1px solid var(--line); width:42px; height:42px; border-radius:10px; cursor:pointer; transition:.2s}
+  .nav button:hover{color:var(--ink); border-color:var(--clay); background:var(--panel-2)}
+  .nav button:focus-visible{outline:2px solid var(--clay); outline-offset:2px}
+  .hint{position:fixed; bottom:24px; left:clamp(28px,5vw,84px); z-index:5; font-family:var(--mono);
+    font-size:.7rem; color:var(--faint); letter-spacing:.1em}
+
+  .grow{flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(14px,2vw,26px); position:relative}
+
+  /* cards & grids */
+  .grid{display:grid; gap:16px}
+  .card{background:linear-gradient(180deg,var(--panel),#0c1426); border:1px solid var(--line);
+    border-radius:16px; padding:22px 24px; position:relative; overflow:hidden}
+  .card h3{font-family:var(--display); font-weight:600; font-size:1.12rem; margin-bottom:6px; display:flex; align-items:center; gap:10px}
+  .card p{font-size:.9rem}
+  .dot{width:9px; height:9px; border-radius:50%; flex:none}
+  .dot.m{background:var(--merah)} .dot.k{background:var(--kuning)} .dot.h{background:var(--hijau)} .dot.c{background:var(--clay)}
+
+  /* file tree */
+  .tree{font-family:var(--mono); font-size:clamp(.78rem,1.05vw,.95rem); line-height:1.85; color:var(--muted)}
+  .tree .d{color:var(--clay-soft)} .tree .f{color:var(--ink)} .tree .c{color:var(--faint)}
+  .tree .new{color:var(--hijau)}
+
+  /* terminal / prompt card */
+  .term{background:#070d18; border:1px solid var(--line); border-radius:14px; overflow:hidden; font-family:var(--mono)}
+  .term .bar{display:flex; align-items:center; gap:7px; padding:11px 15px; border-bottom:1px solid var(--line); background:#0b1322}
+  .term .bar i{width:11px; height:11px; border-radius:50%; display:inline-block; background:#33415a}
+  .term .bar i:first-child{background:var(--merah)} .term .bar i:nth-child(2){background:var(--kuning)} .term .bar i:nth-child(3){background:var(--hijau)}
+  .term .bar span{margin-left:8px; font-size:.72rem; color:var(--faint); letter-spacing:.05em}
+  .term .body{padding:16px 18px; font-size:clamp(.78rem,1vw,.92rem); line-height:1.7}
+  .term .you{color:var(--clay-soft)} .term .you::before{content:"❯ "; color:var(--clay)}
+  .term .out{color:var(--muted)} .term .ok{color:var(--hijau)} .term .cm{color:var(--faint)}
+
+  /* screenshot placeholder slot */
+  .shot{flex:1; min-height:160px; border:2px dashed #34465f; border-radius:16px; display:flex;
+    flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--faint);
+    background:repeating-linear-gradient(135deg,transparent,transparent 14px,rgba(217,119,87,.04) 14px,rgba(217,119,87,.04) 28px)}
+  .shot .ic{font-size:1.6rem}
+  .shot b{font-family:var(--mono); font-size:.8rem; color:var(--clay-soft); letter-spacing:.08em; font-weight:500}
+  .shot small{font-family:var(--mono); font-size:.68rem; color:var(--faint)}
+
+  .stat{font-family:var(--display); font-weight:700; font-size:clamp(1.5rem,2.6vw,2.3rem); color:var(--ink); letter-spacing:-.02em; line-height:1}
+  .stat small{display:block; font-family:var(--mono); font-weight:400; font-size:.66rem; color:var(--muted); letter-spacing:.14em; text-transform:uppercase; margin-top:8px}
+
+  .num{font-family:var(--display); font-weight:700; font-size:1.5rem; color:var(--clay)}
+  ul.clean{list-style:none; display:flex; flex-direction:column; gap:12px}
+  ul.clean li{display:flex; gap:13px; align-items:flex-start; color:var(--muted); font-size:.95rem; line-height:1.5}
+  ul.clean li b{color:var(--ink); font-weight:600}
+  .kbd{font-family:var(--mono); font-size:.72rem; background:var(--panel-2); border:1px solid var(--line); border-radius:5px; padding:2px 7px; color:var(--ink)}
+
+  @media (max-width:760px){
+    .two-col{grid-template-columns:1fr!important}
+    .hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">data-bgn · claude code</span>
+  <div class="covbar" id="progress" aria-hidden="true"></div>
+  <span class="counter"><b id="cur">01</b> / <span id="tot">10</span></span>
+</div>
+
+<main class="deck" id="deck">
+
+  <!-- 0 — COVER / AGENDA -->
+  <section class="slide" data-title="Vibe Coding 101">
+    <div class="grow">
+      <div class="eyebrow">Ikastaratech · Sharing Session</div>
+      <h1>Vibe Coding <span style="color:var(--clay)">101</span></h1>
+      <p class="lead">Membangun perangkat lunak nyata bersama agent — dari menyiapkan lingkungan sampai ngoding bareng.</p>
+      <div class="grid two-col" style="grid-template-columns:1fr 1fr; max-width:880px; align-items:start; margin-top:6px">
+        <ul class="clean">
+          <li><span class="num">01</span><span><b>Sharing pengalaman</b><br><span style="font-size:.86rem">cerita dari proyek nyata.</span></span></li>
+          <li><span class="num">02</span><span><b>Mengenal Claude Code environment</b><br><span style="font-size:.86rem">CLAUDE.md, skills, MCP, hooks.</span></span></li>
+        </ul>
+        <ul class="clean">
+          <li><span class="num">03</span><span><b>Review &amp; prompt project</b><br><span style="font-size:.86rem">bedah kode &amp; cara meminta yang tepat.</span></span></li>
+          <li><span class="num" style="color:var(--hijau)">04</span><span><b>Let's Get Vibing</b><br><span style="font-size:.86rem">ngoding langsung, bareng.</span></span></li>
+        </ul>
+      </div>
+      <div class="covbar" style="max-width:360px; height:8px; margin-top:6px">
+        <span class="lit-m"></span><span class="lit-k"></span><span class="lit-h"></span><span class="lit-h"></span><span class="lit-h"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 — INTRO -->
+  <section class="slide" data-title="Pembuka">
+    <div class="grow">
+      <div class="covbar" style="max-width:340px; height:10px">
+        <span class="lit-m"></span><span class="lit-m"></span><span class="lit-k"></span><span class="lit-h"></span><span class="lit-h"></span><span class="lit-h"></span>
+      </div>
+      <div class="eyebrow">Tutorial · Vibe Coding</div>
+      <h1>Membangun Dashboard<br>bersama <span style="color:var(--clay)">Claude Code</span></h1>
+      <p class="lead">Studi kasus nyata: dashboard <b style="color:var(--ink)">coverage SPPG</b> — membandingkan jumlah dapur Makan Bergizi Gratis dengan populasi penerima (peserta didik PAUD &amp; SD) di tiap kecamatan se-Indonesia.</p>
+      <div class="grid two-col" style="grid-template-columns:repeat(4,1fr); max-width:760px; margin-top:8px">
+        <div class="stat">24.238<small>Dapur SPPG</small></div>
+        <div class="stat">4.948<small>Kecamatan</small></div>
+        <div class="stat">38<small>Provinsi</small></div>
+        <div class="stat" style="color:var(--hijau)">~90%<small>Selesai</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 — STRUCTURE: folder map -->
+  <section class="slide" data-title="Struktur">
+    <div class="grow">
+      <div class="eyebrow">Lingkungan Claude · 1 dari 3</div>
+      <h2>Struktur yang membuat agent paham proyek</h2>
+      <p class="lead">Bukan sekadar folder kode. Tiap bagian memberi konteks ke Claude: di mana logika, di mana data, di mana aturan.</p>
+      <div class="grid two-col" style="grid-template-columns:1.1fr .9fr; align-items:start">
+        <div class="card">
+          <div class="tree">
+<span class="f">CLAUDE.md</span>           <span class="c"># peta + aturan agent</span>
+<span class="f">.mcp.json</span>           <span class="c"># code-review-graph</span>
+<span class="d">.claude/</span>
+  <span class="d">skills/</span>          <span class="c"># 4 skill proyek</span>
+  <span class="f">settings.json</span>    <span class="c"># hooks diagnostic</span>
+<span class="d">backend/</span>           <span class="c"># Express + pg</span>
+<span class="d">frontend/</span>          <span class="c"># Vue 3 + Vite</span>
+<span class="d">infrastructure/</span>    <span class="c"># docker, nginx</span>
+<span class="d">script/</span>            <span class="c"># pipeline + SQL</span>
+<span class="d">docs/</span>              <span class="c"># standar, SRS, ERD</span>
+<span class="d">presentation/</span>      <span class="c"># slide ini</span>
+          </div>
+        </div>
+        <ul class="clean">
+          <li><span class="dot c" style="margin-top:6px"></span><span><b>Pemisahan jelas.</b> Backend, frontend, infrastruktur, dan data hidup di rumahnya masing-masing.</span></li>
+          <li><span class="dot h" style="margin-top:6px"></span><span><b>Dapat dijalankan.</b> Struktur ini bukan teori — DB, API, dan dashboard benar-benar menyala.</span></li>
+          <li><span class="dot k" style="margin-top:6px"></span><span><b>Self-documenting.</b> <span class="kbd">docs/</span> berisi standar kode, proses bisnis, SRS, dan diagram mermaid (alur + ERD).</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 — STRUCTURE: CLAUDE.md + skills -->
+  <section class="slide" data-title="CLAUDE.md & Skills">
+    <div class="grow">
+      <div class="eyebrow">Lingkungan Claude · 2 dari 3</div>
+      <h2>CLAUDE.md &amp; Skills — memori &amp; keahlian</h2>
+      <div class="grid two-col" style="grid-template-columns:1fr 1fr; align-items:start">
+        <div class="card">
+          <h3><span class="dot c"></span>CLAUDE.md</h3>
+          <p>Dibaca tiap sesi. Berisi peta folder, perintah dev, alur data, dan <b style="color:var(--ink)">aturan domain</b> yang tak bisa ditebak dari kode saja.</p>
+          <div class="term" style="margin-top:14px">
+            <div class="body">
+              <div class="out"><span class="cm"># aturan yang “dikunci”</span></div>
+              <div class="out">PORSI_PER_SPPG = <span class="ok">2000</span></div>
+              <div class="out">tier: &lt;70 <span style="color:var(--merah)">merah</span> · 70–90 <span style="color:var(--kuning)">kuning</span> · ≥90 <span style="color:var(--hijau)">hijau</span></div>
+              <div class="out">selalu query dari <span class="ok">v_sppg</span> (38 prov bersih)</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot k"></span>4 Skill proyek</h3>
+          <p>Pengetahuan spesifik repo, dipanggil saat relevan:</p>
+          <ul class="clean" style="margin-top:12px">
+            <li><span class="num" style="font-size:.95rem">→</span><span><b>node-express-api</b> — pola endpoint, try/catch, view bersih.</span></li>
+            <li><span class="num" style="font-size:.95rem">→</span><span><b>vue-dashboard-ui</b> — halaman, peta, warna tier.</span></li>
+            <li><span class="num" style="font-size:.95rem">→</span><span><b>sppg-data-pipeline</b> — scrape → clean → import.</span></li>
+            <li><span class="num" style="font-size:.95rem">→</span><span><b>db-migrations</b> — skema &amp; view idempoten.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 — STRUCTURE: MCP + diagnostic gate -->
+  <section class="slide" data-title="MCP & Diagnostic Gate">
+    <div class="grow">
+      <div class="eyebrow">Lingkungan Claude · 3 dari 3</div>
+      <h2>Tools &amp; disiplin: MCP + Diagnostic Gate</h2>
+      <div class="grid two-col" style="grid-template-columns:1fr 1fr; align-items:start">
+        <div class="card">
+          <h3><span class="dot c"></span>code-review-graph (MCP)</h3>
+          <p>Tree-sitter → graph SQLite dari seluruh kode. Claude membaca <b style="color:var(--ink)">hanya yang relevan</b> + cek blast-radius sebelum mengubah fungsi.</p>
+          <div class="grid" style="grid-template-columns:1fr 1fr; margin-top:14px">
+            <div class="stat" style="font-size:1.6rem">132<small>Node graph</small></div>
+            <div class="stat" style="font-size:1.6rem">902<small>Edge relasi</small></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot h"></span>Diagnostic Gate</h3>
+          <p>Hook otomatis tiap kali kode berubah — agent diingatkan menjalankan urutan ini <b style="color:var(--ink)">sebelum</b> tes browser:</p>
+          <ul class="clean" style="margin-top:12px">
+            <li><span class="num">1</span><span><b>LSP diagnostics</b> — perbaiki error bahasa.</span></li>
+            <li><span class="num">2</span><span><b>Unit test</b> — <span class="kbd">node --test</span> harus hijau.</span></li>
+            <li><span class="num">3</span><span><b>Tes browser</b> — Playwright / Chrome.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 — JOURNEY 01: Database -->
+  <section class="slide" data-title="Perjalanan · Database">
+    <div class="grow">
+      <div class="eyebrow">Perjalanan membangun · Tahap 01</div>
+      <h2><span class="num" style="font-size:2.4rem">01</span>&nbsp; Fondasi: database yang sudah ada</h2>
+      <p class="lead">Kita mulai dari data nyata di PostgreSQL — 24k SPPG, 7k kecamatan DAPODIK, tabel pemetaan &amp; koordinat. Tugas pertama: pahami skema, lalu bersihkan.</p>
+      <div class="grid two-col" style="grid-template-columns:.95fr 1.05fr; align-items:stretch">
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i><span>prompt ke Claude</span></div>
+          <div class="body">
+            <div class="you">Pelajari skema database sppg di Postgres :5435. Buat view bersih yang hanya memuat 38 provinsi valid &amp; perbaiki schema drift.</div>
+            <div class="out cm" style="margin-top:10px"># hasil</div>
+            <div class="out"><span class="ok">v_sppg</span> · <span class="ok">ref_provinsi</span> · coords ditambah</div>
+            <div class="out">provinsi <span style="color:var(--merah)">61</span> → <span class="ok">38</span></div>
+          </div>
+        </div>
+        <div class="shot">
+          <div class="ic">▦</div>
+          <b>[ Screenshot: psql / terminal ]</b>
+          <small>tampilkan \dt + SELECT count(*) FROM v_sppg</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 — JOURNEY 02: Backend -->
+  <section class="slide" data-title="Perjalanan · Backend">
+    <div class="grow">
+      <div class="eyebrow">Perjalanan membangun · Tahap 02</div>
+      <h2><span class="num" style="font-size:2.4rem">02</span>&nbsp; Backend API &amp; logika coverage</h2>
+      <p class="lead">Express + pg menyajikan <span class="kbd">/api/*</span>. Inti bisnis — kapasitas, persentase, tier — jadi satu sumber-kebenaran yang diuji unit test.</p>
+      <div class="grid two-col" style="grid-template-columns:1.05fr .95fr; align-items:stretch">
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i><span>prompt ke Claude</span></div>
+          <div class="body">
+            <div class="you">Hitung coverage = (jumlah_sppg × 2000) / penerima, tandai tier merah/kuning/hijau. Taruh rumus di satu modul + unit test.</div>
+            <div class="out cm" style="margin-top:10px"># node --test</div>
+            <div class="out"><span class="ok">✔ 6 pass</span> · 0 fail &nbsp;<span class="cm">coverage.test.js</span></div>
+          </div>
+        </div>
+        <div class="shot">
+          <div class="ic">▦</div>
+          <b>[ Screenshot: node --test hijau ]</b>
+          <small>atau curl /api/coverage menampilkan tier</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 — JOURNEY 03: Frontend -->
+  <section class="slide" data-title="Perjalanan · Frontend">
+    <div class="grow">
+      <div class="eyebrow">Perjalanan membangun · Tahap 03</div>
+      <h2><span class="num" style="font-size:2.4rem">03</span>&nbsp; Dashboard Vue &amp; peta sebaran</h2>
+      <p class="lead">Vue 3 + Vite + Tailwind. Tabel, ringkasan, dan peta Leaflet yang mewarnai tiap kecamatan sesuai tier coverage — bahasa visual yang sama dari ujung ke ujung.</p>
+      <div class="grid two-col" style="grid-template-columns:.85fr 1.15fr; align-items:stretch">
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i><span>prompt ke Claude</span></div>
+          <div class="body">
+            <div class="you">Buat halaman peta Leaflet; warnai kecamatan sesuai tier coverage &amp; tangani lat/lon kosong.</div>
+            <div class="out cm" style="margin-top:10px"># vite build</div>
+            <div class="out"><span class="ok">✓ built</span> 1583 modules</div>
+          </div>
+        </div>
+        <div class="shot">
+          <div class="ic">🗺</div>
+          <b>[ Screenshot: dashboard + peta ]</b>
+          <small>halaman Peta Distribusi / Analisis Coverage</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 — JOURNEY 04: Diagnostic loop -->
+  <section class="slide" data-title="Perjalanan · Review">
+    <div class="grow">
+      <div class="eyebrow">Perjalanan membangun · Tahap 04</div>
+      <h2><span class="num" style="font-size:2.4rem">04</span>&nbsp; Loop kualitas: diagnose → uji → lacak</h2>
+      <p class="lead">Tiap perubahan kode melewati gerbang yang sama. code-review-graph melacak dampaknya. Inilah yang menjaga proyek tetap presisi &amp; minim bug.</p>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr); gap:14px">
+        <div class="card"><h3><span class="dot c"></span>Tulis</h3><p>Edit oleh Claude. Hook PostToolUse aktif.</p></div>
+        <div class="card"><h3><span class="dot m"></span>Diagnose</h3><p>LSP cek bahasa — error nyata diperbaiki.</p></div>
+        <div class="card"><h3><span class="dot k"></span>Uji</h3><p><span class="kbd">node --test</span> + smoke test endpoint.</p></div>
+        <div class="card"><h3><span class="dot h"></span>Lacak</h3><p>graph update; cek di browser bila lolos.</p></div>
+      </div>
+      <div class="shot" style="min-height:120px">
+        <div class="ic">◎</div>
+        <b>[ Screenshot: code-review-graph status / visualize ]</b>
+        <small>opsional — tampilkan graph dependensi</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 — CLOSING 1 -->
+  <section class="slide" data-title="Rangkuman">
+    <div class="grow">
+      <div class="eyebrow">Penutup · 1 dari 2</div>
+      <h2>Yang membuat vibe coding berhasil</h2>
+      <div class="grid two-col" style="grid-template-columns:1fr 1fr; align-items:start">
+        <ul class="clean">
+          <li><span class="dot c" style="margin-top:6px"></span><span><b>Konteks dulu, kode kemudian.</b> CLAUDE.md + skills membuat agent paham aturan domain.</span></li>
+          <li><span class="dot h" style="margin-top:6px"></span><span><b>Disiplin terotomasi.</b> Diagnostic gate &amp; unit test menangkap bug lebih awal.</span></li>
+          <li><span class="dot k" style="margin-top:6px"></span><span><b>Struktur yang jujur.</b> Pemisahan folder mencerminkan tanggung jawab nyata.</span></li>
+        </ul>
+        <div class="card">
+          <h3 style="color:var(--clay-soft)">Catatan untuk diisi</h3>
+          <p>Ruang untuk poin diskusi Anda: pelajaran, tantangan data, atau langkah berikutnya proyek SPPG.</p>
+          <div class="covbar" style="margin-top:18px"><span class="lit-m"></span><span class="lit-k"></span><span class="lit-h"></span><span class="lit-h"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 — CLOSING 2 -->
+  <section class="slide" data-title="Terima kasih">
+    <div class="grow" style="align-items:flex-start">
+      <div class="covbar" style="max-width:300px; height:10px">
+        <span class="lit-m"></span><span class="lit-k"></span><span class="lit-h"></span><span class="lit-h"></span><span class="lit-h"></span><span class="lit-h"></span>
+      </div>
+      <div class="eyebrow">Penutup · 2 dari 2</div>
+      <h1>Diskusi &amp;<br>Tanya Jawab</h1>
+      <p class="lead">Mari telusuri kode bersama — backend, frontend, atau pipeline data. Semua siap dijalankan langsung dari folder proyek.</p>
+      <div class="term" style="max-width:560px; width:100%; margin-top:6px">
+        <div class="bar"><i></i><i></i><i></i><span>mulai demo</span></div>
+        <div class="body">
+          <div class="out cm"># database</div>
+          <div class="you">cd infrastructure &amp;&amp; docker compose up -d</div>
+          <div class="out cm" style="margin-top:8px"># backend &amp; frontend</div>
+          <div class="you">cd backend &amp;&amp; npm run dev</div>
+          <div class="you">cd frontend &amp;&amp; npm run dev</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="hint">← → · spasi · navigasi</div>
+<nav class="nav">
+  <button id="prev" aria-label="Slide sebelumnya">←</button>
+  <button id="next" aria-label="Slide berikutnya">→</button>
+</nav>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const progress=document.getElementById('progress');
+  const cur=document.getElementById('cur'), tot=document.getElementById('tot');
+  let i=0;
+  // build progress segments coloured as a coverage bar
+  slides.forEach((_,n)=>{const s=document.createElement('span');progress.appendChild(s);});
+  const segs=[...progress.children];
+  const tierClass=n=>{const r=n/(slides.length-1);return r<.34?'lit-m':r<.67?'lit-k':'lit-h';};
+  tot.textContent=String(slides.length).padStart(2,'0');
+
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    segs.forEach((s,k)=>{s.className=''; if(k<=i)s.classList.add(tierClass(k));});
+    cur.textContent=String(i+1).padStart(2,'0');
+  }
+  document.getElementById('next').onclick=()=>show(i+1);
+  document.getElementById('prev').onclick=()=>show(i-1);
+  addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();show(i+1);}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();show(i-1);}
+    else if(e.key==='Home')show(0); else if(e.key==='End')show(slides.length-1);
+  });
+  // swipe (touch)
+  let x0=null; addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+  addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)show(i+(dx<0?1:-1));x0=null;});
+  show(0);
+</script>
+</body>
+</html>

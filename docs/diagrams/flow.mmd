@@ -1,0 +1,24 @@
+%% Alur data & request — dashboard SPPG. Render di https://mermaid.live
+flowchart TD
+    subgraph Pipeline["Pipeline data (script/)"]
+        A[Scrape auditsppg + DAPODIK] --> B[CSV mentah<br/>docs/reference]
+        B --> C[Clean & remap<br/>script/*.py]
+        C --> D[CSV bersih<br/>script/data]
+        D --> E[(COPY ke Postgres<br/>import_data.sql)]
+    end
+
+    subgraph DB["PostgreSQL sppg-db :5435"]
+        E --> F[Tabel: sppg, dapodik_pd,<br/>kecamatan_mapping, kecamatan_coords]
+        F --> G[ref_provinsi + view v_sppg<br/>02_clean_provinsi.sql]
+        G --> H[View analisis<br/>v_sppg_per_kecamatan, dst]
+    end
+
+    subgraph App["Aplikasi"]
+        H --> I[Backend Express<br/>/api/* + lib/coverage.js]
+        I --> J[Frontend Vue<br/>tabel + peta Leaflet + chart]
+    end
+
+    J --> K{Tier coverage}
+    K -->|"< 70%"| K1[Merah]
+    K -->|"70-90%"| K2[Kuning]
+    K -->|">= 90%"| K3[Hijau]

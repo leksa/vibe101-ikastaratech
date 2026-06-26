@@ -1,0 +1,23 @@
+# Postgres untuk dashboard SPPG. Cocok dengan konfigurasi backend (backend/api/db.js):
+#   host=localhost port=5435 db=sppg user=postgres password=sppg
+services:
+  sppg-db:
+    image: postgres:16
+    container_name: sppg-db
+    environment:
+      POSTGRES_DB: sppg
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sppg
+    ports:
+      - "5435:5432"
+    volumes:
+      - sppg_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sppg"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  sppg_pgdata:

@@ -1,0 +1,17 @@
+# Added by code-review-graph
+.code-review-graph/
+
+# Dependencies & build
+node_modules/
+frontend/dist/
+backend/dist/
+
+# OS / editor
+.DS_Store
+
+# Archive (cruft, not part of the app)
+_archive/
+
+# Python
+__pycache__/
+*.pyc

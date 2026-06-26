@@ -1,0 +1,50 @@
+%% ERD — database sppg. Render: https://mermaid.live atau ekstensi Mermaid.
+erDiagram
+    sppg {
+        serial id PK
+        text provinsi
+        text kabkota
+        text kecamatan
+        text desa
+        text kode_wilayah_bps
+        text kode_kecamatan_bps "GENERATED 8 digit"
+        text nama_sppg
+        text alamat
+    }
+    dapodik_pd {
+        serial id PK
+        text provinsi
+        text kabkota
+        text kecamatan
+        text kode_wilayah_dapodik
+        int total_pd
+        int sd_pd
+        int tk_pd
+        int kb_pd
+        int tpa_pd
+        int sps_pd
+        int smp_pd
+        int sma_pd
+        int smk_pd
+        int slb_pd
+    }
+    kecamatan_mapping {
+        serial id PK
+        text kode_kecamatan_bps FK
+        text kode_wilayah_dapodik FK
+        text match_method
+    }
+    kecamatan_coords {
+        serial id PK
+        text kode_kecamatan_bps FK
+        float lat
+        float lon
+    }
+    ref_provinsi {
+        text nama_provinsi PK "38 provinsi valid"
+    }
+
+    sppg ||--o{ kecamatan_mapping : "kode_kecamatan_bps"
+    dapodik_pd ||--o{ kecamatan_mapping : "kode_wilayah_dapodik"
+    sppg ||--o{ kecamatan_coords : "kode_kecamatan_bps"
+    ref_provinsi ||--o{ sppg : "provinsi (filter v_sppg)"
