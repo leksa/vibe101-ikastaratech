@@ -1,5 +1,7 @@
 # Dashboard Coverage SPPG — Vibe Coding 101
 
+![Dashboard — Peta Sebaran SPPG](docs/screenshots/dashboard-peta.png)
+
 Dashboard untuk memantau **kecukupan (coverage) dapur SPPG** (Satuan Pelayanan
 Pemenuhan Gizi, program **Makan Bergizi Gratis / MBG**) terhadap **populasi penerima**
 (peserta didik KB–TK–SD dari DAPODIK) di tiap kecamatan se-Indonesia.
