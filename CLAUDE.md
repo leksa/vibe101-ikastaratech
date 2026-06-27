@@ -78,7 +78,8 @@ Skema & view: `script/sql/setup_db.sql` → `02_clean_provinsi.sql` → `import_
   Didefinisikan SEKALI di `backend/lib/coverage.js`; query SQL menirunya. Ubah di sana.
 - **coverage %** = `(jumlah_sppg * 2000) / penerima_paud_sd * 100`.
   Penerima = `sd + tk + kb + tpa + sps`.
-- **tier**: `< 70` merah, `70–90` kuning, `≥ 90` hijau (`TIER_MERAH_MAX` / `TIER_KUNING_MAX`).
+- **tier** (4 tingkat): `< 70` merah · `70–89` kuning · `90–100` hijau_muda · `> 100` hijau_tua
+  (`TIER_MERAH_MAX` / `TIER_KUNING_MAX` / `TIER_HIJAU_MAX`).
 - **`v_sppg`** = view SPPG yang sudah difilter ke 38 provinsi valid (`ref_provinsi`).
   Selalu query dari `v_sppg`, JANGAN dari tabel `sppg` mentah (ada ~26 baris kotor:
   fragmen alamat masuk ke kolom provinsi). Detail: `script/sql/02_clean_provinsi.sql`.

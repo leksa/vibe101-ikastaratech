@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   PORSI_PER_SPPG_PER_HARI,
+  TIER_HIJAU_MAX,
   kapasitas,
   coveragePct,
   tier,
@@ -29,21 +30,25 @@ test('coveragePct: rumus benar', () => {
   assert.equal(coveragePct(1, 4000), 50)
 })
 
-test('tier: batas merah/kuning/hijau (70 / 90)', () => {
+test('tier: 4 tingkat merah/kuning/hijau_muda/hijau_tua', () => {
   // penerima 2000 -> pct = jumlahSppg * 100
   assert.equal(tier(0, 2000), 'merah') // 0%
   assert.equal(tier(1, 4000), 'merah') // 50%
   assert.equal(tier(1, 3000), 'merah') // 66.7%
   assert.equal(tier(1, 2500), 'kuning') // 80%
-  assert.equal(tier(1, 2000), 'hijau') // 100%
+  assert.equal(tier(1, 2000), 'hijau_muda') // 100%
+  assert.equal(tier(2, 2000), 'hijau_tua') // 200%
 })
 
-test('tier: tepat di batas', () => {
+test('tier: tepat di batas (70 / 90 / 100)', () => {
   // penerima 20000, kapasitas = jumlahSppg * 2000 -> pct = jumlahSppg * 10
   assert.equal(tier(6.999, 20000), 'merah') // 69.99%
   assert.equal(tier(7, 20000), 'kuning') // 70.00%
   assert.equal(tier(8.999, 20000), 'kuning') // 89.99%
-  assert.equal(tier(9, 20000), 'hijau') // 90.00%
+  assert.equal(tier(9, 20000), 'hijau_muda') // 90.00%
+  assert.equal(tier(10, 20000), 'hijau_muda') // 100.00% (batas, masih muda)
+  assert.equal(tier(10.001, 20000), 'hijau_tua') // 100.01%
+  assert.equal(TIER_HIJAU_MAX, 100)
 })
 
 test('tier: tanpa data penerima -> null', () => {

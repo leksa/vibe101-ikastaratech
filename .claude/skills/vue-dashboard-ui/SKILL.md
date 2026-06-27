@@ -18,7 +18,7 @@ di `frontend/src/router.js`; layout di `App.vue` (Sidebar + `<router-view>`).
 3. **Warna tier coverage** dari Tailwind theme (`tailwind.config.js`):
    `coverage.low` (#ef4444 merah), `coverage.medium` (#eab308 kuning),
    `coverage.high` (#22c55e hijau). Map `tier`/`coverage_persen` dari API ke warna ini —
-   ambang sama: `<70` merah, `70–90` kuning, `≥90` hijau.
+   ambang sama: `<70` merah, `70–89` kuning, `90–100` hijau muda, `>100` hijau tua.
 4. **Peta** pakai Leaflet; marker/warna kecamatan ikut tier. Pastikan handle `lat/lon` null
    (banyak kecamatan tanpa koordinat).
 5. Gunakan `@` alias untuk `src/` (sudah dikonfigurasi di `vite.config.js`).

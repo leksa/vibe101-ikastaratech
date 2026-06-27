@@ -3,9 +3,10 @@
     <h2 class="page-title">Peta Distribusi SPPG</h2>
 
     <!-- Legend -->
-    <div class="flex items-center gap-4 mb-3 text-xs bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 self-start">
+    <div class="flex items-center gap-4 mb-3 text-xs bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 self-start flex-wrap">
       <span class="text-slate-500 font-medium">Legenda:</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500 inline-block" />Hijau (≥90%)</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-700 inline-block" />Hijau tua (&gt;100%)</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500 inline-block" />Hijau muda (90-100%)</span>
       <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-yellow-500 inline-block" />Kuning (70-89%)</span>
       <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500 inline-block" />Merah (&lt;70%)</span>
       <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-400 inline-block" />Tidak ada data PD</span>
@@ -44,7 +45,8 @@ onUnmounted(() => {
 })
 
 function tierColor(tier) {
-  if (tier === 'hijau') return '#22c55e'
+  if (tier === 'hijau_tua') return '#15803d'
+  if (tier === 'hijau_muda') return '#22c55e'
   if (tier === 'kuning') return '#eab308'
   if (tier === 'merah') return '#ef4444'
   return '#94a3b8'

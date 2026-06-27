@@ -104,6 +104,13 @@
     flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--faint);
     background:repeating-linear-gradient(135deg,transparent,transparent 14px,rgba(217,119,87,.04) 14px,rgba(217,119,87,.04) 28px)}
   .shot .ic{font-size:1.6rem}
+
+  /* embedded real screenshot */
+  .frame{flex:1; min-height:160px; display:flex; flex-direction:column; border:1px solid var(--line);
+    border-radius:16px; overflow:hidden; background:#070d18}
+  .frame img{width:100%; height:100%; object-fit:cover; object-position:top left; display:block}
+  .frame figcaption{font-family:var(--mono); font-size:.68rem; color:var(--faint); letter-spacing:.04em;
+    padding:8px 12px; border-top:1px solid var(--line); background:#0b1322}
   .shot b{font-family:var(--mono); font-size:.8rem; color:var(--clay-soft); letter-spacing:.08em; font-weight:500}
   .shot small{font-family:var(--mono); font-size:.68rem; color:var(--faint)}
 
@@ -142,10 +149,11 @@
         <ul class="clean">
           <li><span class="num">01</span><span><b>Sharing pengalaman</b><br><span style="font-size:.86rem">cerita dari proyek nyata.</span></span></li>
           <li><span class="num">02</span><span><b>Mengenal Claude Code environment</b><br><span style="font-size:.86rem">CLAUDE.md, skills, MCP, hooks.</span></span></li>
+          <li><span class="num">03</span><span><b>Prompt project &amp; review</b><br><span style="font-size:.86rem">menulis prompt tepat &amp; bedah hasilnya.</span></span></li>
         </ul>
         <ul class="clean">
-          <li><span class="num">03</span><span><b>Review &amp; prompt project</b><br><span style="font-size:.86rem">bedah kode &amp; cara meminta yang tepat.</span></span></li>
-          <li><span class="num" style="color:var(--hijau)">04</span><span><b>Let's Get Vibing</b><br><span style="font-size:.86rem">ngoding langsung, bareng.</span></span></li>
+          <li><span class="num">04</span><span><b>Note taking &amp; tanya jawab</b><br><span style="font-size:.86rem">catat insight &amp; diskusi.</span></span></li>
+          <li><span class="num" style="color:var(--hijau)">05</span><span><b>Let's Get Vibing</b><br><span style="font-size:.86rem">ngoding langsung, bareng.</span></span></li>
         </ul>
       </div>
       <div class="covbar" style="max-width:360px; height:8px; margin-top:6px">
@@ -216,7 +224,7 @@
             <div class="body">
               <div class="out"><span class="cm"># aturan yang “dikunci”</span></div>
               <div class="out">PORSI_PER_SPPG = <span class="ok">2000</span></div>
-              <div class="out">tier: &lt;70 <span style="color:var(--merah)">merah</span> · 70–90 <span style="color:var(--kuning)">kuning</span> · ≥90 <span style="color:var(--hijau)">hijau</span></div>
+              <div class="out">tier: <span style="color:var(--merah)">&lt;70</span> · <span style="color:var(--kuning)">70–89</span> · <span style="color:var(--hijau)">90–100</span> · <span style="color:#15803d">&gt;100</span></div>
               <div class="out">selalu query dari <span class="ok">v_sppg</span> (38 prov bersih)</div>
             </div>
           </div>
@@ -278,10 +286,24 @@
             <div class="out">provinsi <span style="color:var(--merah)">61</span> → <span class="ok">38</span></div>
           </div>
         </div>
-        <div class="shot">
-          <div class="ic">▦</div>
-          <b>[ Screenshot: psql / terminal ]</b>
-          <small>tampilkan \dt + SELECT count(*) FROM v_sppg</small>
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i><span>terminal · psql</span></div>
+          <div class="body" style="font-size:clamp(.68rem,.82vw,.8rem); line-height:1.55">
+            <div class="you">docker exec -it sppg-db psql -U postgres -d sppg</div>
+            <div class="out cm" style="margin-top:6px">sppg=# \dt</div>
+            <div class="out">&nbsp;public | sppg              | table</div>
+            <div class="out">&nbsp;public | dapodik_pd        | table</div>
+            <div class="out">&nbsp;public | kecamatan_mapping | table</div>
+            <div class="out">&nbsp;public | kecamatan_coords  | table</div>
+            <div class="out">&nbsp;public | <span class="ok">ref_provinsi</span>      | table</div>
+            <div class="out cm">(6 rows)</div>
+            <div class="you" style="margin-top:8px">SELECT count(*) FROM sppg;</div>
+            <div class="out">&nbsp;<span style="color:var(--merah)">24264</span>&nbsp;&nbsp;<span class="cm">-- mentah (ada provinsi kotor)</span></div>
+            <div class="you" style="margin-top:4px">SELECT count(*) FROM v_sppg;</div>
+            <div class="out">&nbsp;<span class="ok">24238</span>&nbsp;&nbsp;<span class="cm">-- view bersih</span></div>
+            <div class="you" style="margin-top:4px">SELECT count(DISTINCT provinsi) FROM v_sppg;</div>
+            <div class="out">&nbsp;<span class="ok">38</span> <span class="cm">✓</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -302,10 +324,19 @@
             <div class="out"><span class="ok">✔ 6 pass</span> · 0 fail &nbsp;<span class="cm">coverage.test.js</span></div>
           </div>
         </div>
-        <div class="shot">
-          <div class="ic">▦</div>
-          <b>[ Screenshot: node --test hijau ]</b>
-          <small>atau curl /api/coverage menampilkan tier</small>
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i><span>terminal · node --test</span></div>
+          <div class="body" style="font-size:clamp(.68rem,.82vw,.8rem); line-height:1.6">
+            <div class="you">cd backend &amp;&amp; node --test</div>
+            <div class="out ok" style="margin-top:6px">✔ kapasitas = jumlah SPPG × porsi</div>
+            <div class="out ok">✔ coveragePct: penerima tidak valid → null</div>
+            <div class="out ok">✔ coveragePct: rumus benar</div>
+            <div class="out ok">✔ tier: 4 tingkat merah/kuning/h_muda/h_tua</div>
+            <div class="out ok">✔ tier: tepat di batas (70 / 90 / 100)</div>
+            <div class="out ok">✔ tier: tanpa data penerima → null</div>
+            <div class="out cm" style="margin-top:8px">ℹ tests 6</div>
+            <div class="out"><span class="ok">ℹ pass 6</span> &nbsp; ℹ fail 0</div>
+          </div>
         </div>
       </div>
     </div>
@@ -326,11 +357,10 @@
             <div class="out"><span class="ok">✓ built</span> 1583 modules</div>
           </div>
         </div>
-        <div class="shot">
-          <div class="ic">🗺</div>
-          <b>[ Screenshot: dashboard + peta ]</b>
-          <small>halaman Peta Distribusi / Analisis Coverage</small>
-        </div>
+        <figure class="frame">
+          <img src="assets/peta.png" alt="Dashboard Peta Distribusi SPPG" />
+          <figcaption>Peta Distribusi — warna kecamatan ikut tier coverage</figcaption>
+        </figure>
       </div>
     </div>
   </section>
@@ -347,10 +377,19 @@
         <div class="card"><h3><span class="dot k"></span>Uji</h3><p><span class="kbd">node --test</span> + smoke test endpoint.</p></div>
         <div class="card"><h3><span class="dot h"></span>Lacak</h3><p>graph update; cek di browser bila lolos.</p></div>
       </div>
-      <div class="shot" style="min-height:120px">
-        <div class="ic">◎</div>
-        <b>[ Screenshot: code-review-graph status / visualize ]</b>
-        <small>opsional — tampilkan graph dependensi</small>
+      <div class="term">
+        <div class="bar"><i></i><i></i><i></i><span>terminal · code-review-graph</span></div>
+        <div class="body" style="font-size:clamp(.7rem,.86vw,.82rem); line-height:1.7">
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:6px 24px">
+            <div class="you">code-review-graph status</div><div></div>
+            <div class="out">Nodes: <span class="ok">119</span></div>
+            <div class="out">Edges: <span class="ok">887</span></div>
+            <div class="out">Files: <span class="ok">27</span></div>
+            <div class="out">Languages: <span class="cm">js, vue, python, bash</span></div>
+          </div>
+          <div class="out cm" style="margin-top:6px"># cek dampak sebelum ubah fungsi inti</div>
+          <div class="you">code-review-graph detect-changes</div>
+        </div>
       </div>
     </div>
   </section>

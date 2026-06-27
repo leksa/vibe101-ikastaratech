@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import db from './db.js'
-import { PORSI_PER_SPPG_PER_HARI, TIER_MERAH_MAX, TIER_KUNING_MAX } from '../lib/coverage.js'
+import { PORSI_PER_SPPG_PER_HARI, TIER_MERAH_MAX, TIER_KUNING_MAX, TIER_HIJAU_MAX } from '../lib/coverage.js'
 
 const router = Router()
 
@@ -106,7 +106,8 @@ router.get('/kecamatan', async (req, res) => {
         CASE WHEN ${COV('d')} IS NULL OR ${COV('d')} = 0 THEN NULL
           WHEN ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} < ${TIER_MERAH_MAX} THEN 'merah'
           WHEN ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} < ${TIER_KUNING_MAX} THEN 'kuning'
-          ELSE 'hijau' END as tier,
+          WHEN ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} <= ${TIER_HIJAU_MAX} THEN 'hijau_muda'
+          ELSE 'hijau_tua' END as tier,
         ROUND(${COVERAGE_PCT('v.jumlah_sppg', COV('d'))}, 1) as coverage_persen
       FROM (${V}) v
       LEFT JOIN (${DAPODIK_AGG}) d ON v.kode_kecamatan_bps = d.kode_kecamatan_bps
@@ -131,9 +132,10 @@ router.get('/coverage', async (req, res) => {
       )
       SELECT count(*) as total_kecamatan,
         count(*) FILTER (WHERE pct IS NULL) as no_data,
-        count(*) FILTER (WHERE pct < 70 AND pct IS NOT NULL) as merah,
-        count(*) FILTER (WHERE pct >= 70 AND pct < 90) as kuning,
-        count(*) FILTER (WHERE pct >= 90) as hijau,
+        count(*) FILTER (WHERE pct < ${TIER_MERAH_MAX} AND pct IS NOT NULL) as merah,
+        count(*) FILTER (WHERE pct >= ${TIER_MERAH_MAX} AND pct < ${TIER_KUNING_MAX}) as kuning,
+        count(*) FILTER (WHERE pct >= ${TIER_KUNING_MAX} AND pct <= ${TIER_HIJAU_MAX}) as hijau_muda,
+        count(*) FILTER (WHERE pct > ${TIER_HIJAU_MAX}) as hijau_tua,
         ROUND(COALESCE(AVG(pct), 0), 1) as rata_rata_coverage
       FROM cov
     `)
@@ -155,9 +157,10 @@ router.get('/coverage/provinsi', async (req, res) => {
       )
       SELECT provinsi, count(*) as total_kecamatan,
         count(*) FILTER (WHERE pct IS NOT NULL) as terdata,
-        count(*) FILTER (WHERE pct < 70 AND pct IS NOT NULL) as merah,
-        count(*) FILTER (WHERE pct >= 70 AND pct < 90) as kuning,
-        count(*) FILTER (WHERE pct >= 90) as hijau,
+        count(*) FILTER (WHERE pct < ${TIER_MERAH_MAX} AND pct IS NOT NULL) as merah,
+        count(*) FILTER (WHERE pct >= ${TIER_MERAH_MAX} AND pct < ${TIER_KUNING_MAX}) as kuning,
+        count(*) FILTER (WHERE pct >= ${TIER_KUNING_MAX} AND pct <= ${TIER_HIJAU_MAX}) as hijau_muda,
+        count(*) FILTER (WHERE pct > ${TIER_HIJAU_MAX}) as hijau_tua,
         ROUND(COALESCE(AVG(pct), 0), 1) as rata_rata_coverage
       FROM cov GROUP BY provinsi ORDER BY provinsi
     `)
@@ -179,9 +182,10 @@ router.get('/coverage/kabkota', async (req, res) => {
       )
       SELECT provinsi, kabkota, count(*) as total_kecamatan,
         count(*) FILTER (WHERE pct IS NOT NULL) as terdata,
-        count(*) FILTER (WHERE pct < 70 AND pct IS NOT NULL) as merah,
-        count(*) FILTER (WHERE pct >= 70 AND pct < 90) as kuning,
-        count(*) FILTER (WHERE pct >= 90) as hijau,
+        count(*) FILTER (WHERE pct < ${TIER_MERAH_MAX} AND pct IS NOT NULL) as merah,
+        count(*) FILTER (WHERE pct >= ${TIER_MERAH_MAX} AND pct < ${TIER_KUNING_MAX}) as kuning,
+        count(*) FILTER (WHERE pct >= ${TIER_KUNING_MAX} AND pct <= ${TIER_HIJAU_MAX}) as hijau_muda,
+        count(*) FILTER (WHERE pct > ${TIER_HIJAU_MAX}) as hijau_tua,
         ROUND(COALESCE(AVG(pct), 0), 1) as rata_rata_coverage
       FROM cov GROUP BY provinsi, kabkota ORDER BY provinsi, kabkota
     `)

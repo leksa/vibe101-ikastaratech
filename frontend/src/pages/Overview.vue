@@ -26,32 +26,39 @@
               <p class="text-xs text-slate-400">Rata-rata</p>
             </div>
             <div class="h-12 w-px bg-slate-200" />
-            <div class="flex gap-4 text-sm">
-              <div><span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-1" />Hijau <strong>{{ coverage.hijau }}</strong></div>
+            <div class="flex gap-3 text-sm flex-wrap">
+              <div><span class="inline-block w-3 h-3 rounded-full bg-green-700 mr-1" />Hijau tua <strong>{{ coverage.hijau_tua }}</strong></div>
+              <div><span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-1" />Hijau muda <strong>{{ coverage.hijau_muda }}</strong></div>
               <div><span class="inline-block w-3 h-3 rounded-full bg-yellow-500 mr-1" />Kuning <strong>{{ coverage.kuning }}</strong></div>
               <div><span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-1" />Merah <strong>{{ coverage.merah }}</strong></div>
               <div><span class="inline-block w-3 h-3 rounded-full bg-slate-300 mr-1" />N/A <strong>{{ coverage.no_data }}</strong></div>
             </div>
           </div>
-          <!-- Mini bar chart: merah/kuning/hijau distribution -->
+          <!-- Mini bar chart: distribusi merah/kuning/hijau muda/hijau tua -->
           <div class="h-3 rounded-full bg-slate-100 flex overflow-hidden">
             <div
               v-if="coverage.merah > 0"
               class="h-full bg-red-500 transition-all"
-              :style="{ width: (coverage.merah / (coverage.merah+coverage.kuning+coverage.hijau)) * 100 + '%' }"
+              :style="{ width: pctOf(coverage.merah) }"
               :title="coverage.merah + ' merah'"
             />
             <div
               v-if="coverage.kuning > 0"
               class="h-full bg-yellow-500 transition-all"
-              :style="{ width: (coverage.kuning / (coverage.merah+coverage.kuning+coverage.hijau)) * 100 + '%' }"
+              :style="{ width: pctOf(coverage.kuning) }"
               :title="coverage.kuning + ' kuning'"
             />
             <div
-              v-if="coverage.hijau > 0"
+              v-if="coverage.hijau_muda > 0"
               class="h-full bg-green-500 transition-all"
-              :style="{ width: (coverage.hijau / (coverage.merah+coverage.kuning+coverage.hijau)) * 100 + '%' }"
-              :title="coverage.hijau + ' hijau'"
+              :style="{ width: pctOf(coverage.hijau_muda) }"
+              :title="coverage.hijau_muda + ' hijau muda'"
+            />
+            <div
+              v-if="coverage.hijau_tua > 0"
+              class="h-full bg-green-700 transition-all"
+              :style="{ width: pctOf(coverage.hijau_tua) }"
+              :title="coverage.hijau_tua + ' hijau tua'"
             />
           </div>
           <p class="text-xs text-slate-400 mt-2">
@@ -145,20 +152,26 @@ const provinsiCoverage = computed(() =>
   (provinsiCoverageData.value || []).filter(p => p.rata_rata_coverage > 0).slice(0, 20)
 )
 
-const coverageAvgColor = computed(() => {
-  const v = coverage.value.rata_rata_coverage || 0
-  if (v >= 90) return 'text-green-600'
-  if (v >= 70) return 'text-yellow-600'
-  return 'text-red-600'
-})
+// Denominator distribusi tier (4 tingkat) untuk lebar mini-bar.
+function pctOf(n) {
+  const c = coverage.value
+  const total = (Number(c.merah) || 0) + (Number(c.kuning) || 0) +
+    (Number(c.hijau_muda) || 0) + (Number(c.hijau_tua) || 0)
+  if (!total) return '0%'
+  return ((Number(n) || 0) / total) * 100 + '%'
+}
+
+const coverageAvgColor = computed(() => tierTextClass(coverage.value.rata_rata_coverage || 0))
 
 function tierClass(v) {
+  if (v > 100) return 'bg-green-700'
   if (v >= 90) return 'bg-green-500'
   if (v >= 70) return 'bg-yellow-500'
   return 'bg-red-500'
 }
 
 function tierTextClass(v) {
+  if (v > 100) return 'text-green-700'
   if (v >= 90) return 'text-green-600'
   if (v >= 70) return 'text-yellow-600'
   return 'text-red-600'

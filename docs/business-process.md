@@ -23,7 +23,8 @@ wilayah DAPODIK → dijembatani tabel `kecamatan_mapping`.
   (PAUD + SD; jenjang SMP/SMA/SMK/SLB tidak dihitung sebagai sasaran MBG di model ini).
 - **Kapasitas** = `jumlah_sppg × 2000` porsi/hari (asumsi 1 SPPG = 2000 porsi/hari).
 - **Coverage %** = `kapasitas / penerima × 100`.
-- **Tier**: `< 70%` merah (kurang), `70–90%` kuning (cukup), `≥ 90%` hijau (memadai).
+- **Tier** (4 tingkat): `< 70%` merah (kurang), `70–89%` kuning (cukup),
+  `90–100%` hijau muda (memadai), `> 100%` hijau tua (surplus).
 
 > Asumsi 2000 porsi/SPPG adalah parameter kebijakan, bukan fakta lapangan; semua angka
 > coverage sensitif terhadap nilai ini. Diubah di `backend/lib/coverage.js`.
