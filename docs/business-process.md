@@ -13,6 +13,11 @@ untuk melayani populasi penerima (peserta didik PAUD + SD)?**
 | auditsppg / SPPG Indonesia | lokasi & nama dapur SPPG | per dapur (titik) |
 | DAPODIK | jumlah peserta didik per jenjang | per kecamatan |
 | BPS / Kemendagri | kode & koordinat wilayah | per kecamatan |
+| SSGI / SKI 2024 | prevalensi stunting | per provinsi |
+| GeoJSON 38 provinsi | polygon batas provinsi (choropleth) | per provinsi |
+
+> Polygon provinsi: denyherianto/indonesia-geojson-38-provinces (CC BY 4.0).
+> Prevalensi stunting: `docs/reference/Peta-Prevalensi-Stunting-Per-Provinsi.csv`.
 
 Penghubung antar-sumber: **kode kecamatan**. SPPG pakai kode BPS, DAPODIK pakai kode
 wilayah DAPODIK → dijembatani tabel `kecamatan_mapping`.

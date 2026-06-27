@@ -33,6 +33,7 @@ backend/         API Express + pg
 frontend/        Vue 3 + Vite
   src/pages/       Overview, PetaDistribusi, DataSppg, PesertaDidik, AnalisisCoverage, Laporan
   src/components/  Sidebar
+  public/geo/      indonesia-38.geojson (polygon provinsi, choropleth stunting)
 infrastructure/  docker-compose (Postgres), nginx reverse-proxy
 script/          pipeline data (scrape, clean, map) + SQL (script/sql) + hooks
 docs/

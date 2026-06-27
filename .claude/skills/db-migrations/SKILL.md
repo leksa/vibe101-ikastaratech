@@ -15,6 +15,8 @@ Database PostgreSQL di container `sppg-db` (port `5435`, db `sppg`). Semua DDL/v
 2. `02_clean_provinsi.sql` — `ref_provinsi` (38 provinsi) + view `v_sppg`.
 3. `import_data.sql` — `COPY` CSV ke tabel (lihat skill sppg-data-pipeline).
 4. `analysis_views.sql` — view analisis (`v_sppg_per_kecamatan` baca dari `v_sppg`, dst).
+5. `03_stunting.sql` — tabel `stunting_provinsi` (prevalensi stunting per provinsi, SSGI/SKI
+   2024; provinsi UPPERCASE agar match `ref_provinsi`).
 
 ## Aturan
 

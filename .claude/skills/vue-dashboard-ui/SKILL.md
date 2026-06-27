@@ -27,7 +27,13 @@ di `frontend/src/router.js`; layout di `App.vue` (Sidebar + `<router-view>`).
 
 `/api/stats`, `/api/sppg` (paginasi + filter q/provinsi/kabkota), `/api/kecamatan`,
 `/api/coverage`, `/api/coverage/provinsi`, `/api/coverage/kabkota`,
-`/api/coverage/detail/:kode`, `/api/peserta-didik`, `/api/distribusi`, `/api/filter-options`.
+`/api/coverage/detail/:kode`, `/api/peserta-didik`, `/api/distribusi`, `/api/filter-options`,
+`/api/stunting` (prevalensi stunting per provinsi).
+
+**Peta choropleth**: polygon 38 provinsi di `frontend/public/geo/indonesia-38.geojson`
+(properti `PROVINSI` title-case). Join ke data per provinsi via `PROVINSI.toUpperCase()`
+(cocok dengan kolom `provinsi` uppercase di DB). Lihat `PetaDistribusi.vue` (toggle titik
+SPPG vs choropleth stunting).
 
 ## Setelah mengubah frontend (Diagnostic Gate)
 

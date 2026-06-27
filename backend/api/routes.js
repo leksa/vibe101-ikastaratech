@@ -260,6 +260,20 @@ router.get('/distribusi', async (req, res) => {
   }
 })
 
+router.get('/stunting', async (req, res) => {
+  try {
+    const r = await db.query(`
+      SELECT provinsi, prevalensi, kategori, tahun
+      FROM stunting_provinsi
+      ORDER BY provinsi
+    `)
+    res.json(r.rows)
+  } catch (err) {
+    console.error('GET /stunting error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 router.get('/filter-options', async (req, res) => {
   try {
     const prov = await db.query(`SELECT DISTINCT provinsi FROM v_sppg ORDER BY provinsi`)
