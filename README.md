@@ -151,5 +151,8 @@ Jakarta Complexity
 
 ## 📄 Lisensi
 
-Belum ditentukan (internal / materi tutorial). Polygon provinsi mengikuti lisensi
-sumbernya (CC BY 4.0).
+Dirilis ke **domain publik** di bawah [The Unlicense](LICENSE) — bebas disalin, diubah,
+dipublikasikan, dipakai, dan dijual untuk tujuan apa pun, tanpa syarat.
+
+Pengecualian data pihak ketiga: polygon provinsi mengikuti lisensi sumbernya
+(CC BY 4.0). Data SPPG/DAPODIK/stunting mengikuti ketentuan sumber resmi masing-masing.
