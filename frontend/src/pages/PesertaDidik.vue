@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="page-title">Data Peserta Didik (Sasaran KB–TK–SD–SMP–SMA)</h2>
+    <h2 class="page-title">Data Peserta Didik (Sasaran KB–TK–SD)</h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
       <div class="stat-card">
@@ -10,7 +10,7 @@
       <div class="stat-card border-l-4 border-sky-400">
         <p class="text-sm text-slate-500">Penerima sasaran</p>
         <p class="text-2xl font-bold text-sky-600">{{ paudSdTotal.toLocaleString('id-ID') }}</p>
-        <p class="text-xs text-slate-400">KB–TK–SD–SMP–SMA (sederajat)</p>
+        <p class="text-xs text-slate-400">KB–TK–SD (sederajat)</p>
       </div>
       <div class="stat-card">
         <p class="text-sm text-slate-500">Total PD (semua jenjang)</p>
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="text-xs text-slate-500 bg-amber-50 p-3 rounded-lg">
-          <strong>Fokus Coverage:</strong> KB–TK–SD–SMP–SMA sederajat — PAUD (TK+KB+TPA+SPS) + SD + SMP + SMA + SMK — <strong>{{ paudSdTotal.toLocaleString('id-ID') }}</strong> siswa sasaran
+          <strong>Fokus Coverage:</strong> KB–TK–SD sederajat — PAUD (TK+KB+TPA+SPS) + SD — <strong>{{ paudSdTotal.toLocaleString('id-ID') }}</strong> siswa sasaran
         </div>
       </div>
     </div>

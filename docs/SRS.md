@@ -5,7 +5,7 @@ Versi ringkas. Status: aplikasi ~90% jalan.
 ## 1. Tujuan
 
 Menyediakan dashboard untuk memantau kecukupan (coverage) dapur SPPG terhadap populasi
-penerima MBG (peserta didik KB–TK–SD–SMP–SMA) per kecamatan, kabkota, dan provinsi.
+penerima MBG (peserta didik KB–TK–SD) per kecamatan, kabkota, dan provinsi.
 
 ## 2. Pengguna
 

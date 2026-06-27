@@ -75,8 +75,8 @@
         <p class="text-sm text-sky-800">
           <strong>Catatan:</strong> Data peserta didik bersumber dari DAPODIK.
           Coverage dihitung sebagai perbandingan antara kapasitas SPPG (2.000 porsi/hari per SPPG)
-          dengan <strong>penerima sasaran</strong> KB–TK–SD–SMP–SMA sederajat
-          (TK+KB+TPA+SPS+SD+SMP+SMA+SMK) per kecamatan.
+          dengan <strong>penerima sasaran</strong> KB–TK–SD sederajat
+          (TK+KB+TPA+SPS+SD) per kecamatan.
           Data bersifat sementara dan akan diperbarui secara berkala.
         </p>
       </div>

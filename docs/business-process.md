@@ -24,8 +24,8 @@ wilayah DAPODIK → dijembatani tabel `kecamatan_mapping`.
 
 ## Definisi & rumus
 
-- **Penerima sasaran** per kecamatan = `tk_pd + kb_pd + tpa_pd + sps_pd + sd_pd + smp_pd + sma_pd + smk_pd`
-  (KB–TK–SD–SMP–SMA sederajat: PAUD + SD + SMP + SMA/SMK. SLB & non-formal (PKBM/SKB)
+- **Penerima sasaran** per kecamatan = `tk_pd + kb_pd + tpa_pd + sps_pd + sd_pd`
+  (KB–TK–SD sederajat: PAUD + SD. Jenjang SMP/SMA/SMK/SLB & non-formal (PKBM/SKB)
   tidak dihitung sebagai sasaran MBG di model ini).
 - **Kapasitas** = `jumlah_sppg × 2000` porsi/hari (asumsi 1 SPPG = 2000 porsi/hari).
 - **Coverage %** = `kapasitas / penerima × 100`.

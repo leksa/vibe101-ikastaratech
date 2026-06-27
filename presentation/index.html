@@ -140,6 +140,28 @@
     .two-col{grid-template-columns:1fr!important}
     .hint{display:none}
   }
+
+  /* ---- PDF / print: tiap slide jadi satu halaman 16:9 ---- */
+  @media print{
+    @page{ size:13.333in 7.5in; margin:0 }
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important }
+    html,body{ height:auto; overflow:visible; background:var(--bg) }
+    body::before{ display:none }
+    .topbar,.nav,.hint{ display:none !important }
+    .deck{ position:static }
+    .slide{
+      position:relative !important; inset:auto !important;
+      opacity:1 !important; visibility:visible !important; transform:none !important;
+      width:13.333in; height:7.5in; overflow:hidden;
+      break-after:page; page-break-after:always; break-inside:avoid;
+      transition:none !important;
+    }
+    .slide:last-child{ break-after:auto; page-break-after:auto }
+    /* gambar embedded: height:100% di flex collapse/overflow saat print -> pakai auto + batas */
+    .frame{ display:block !important; overflow:hidden }
+    .frame img{ width:100% !important; height:auto !important; max-height:3.7in !important;
+      object-fit:contain !important; object-position:center !important }
+  }
 </style>
 </head>
 <body>
@@ -444,20 +466,10 @@
         <div class="card"><h3><span class="dot k"></span>Uji</h3><p><span class="kbd">node --test</span> + smoke test endpoint.</p></div>
         <div class="card"><h3><span class="dot h"></span>Lacak</h3><p>graph update; cek di browser bila lolos.</p></div>
       </div>
-      <div class="term">
-        <div class="bar"><i></i><i></i><i></i><span>terminal · code-review-graph</span></div>
-        <div class="body" style="font-size:clamp(.7rem,.86vw,.82rem); line-height:1.7">
-          <div class="grid" style="grid-template-columns:1fr 1fr; gap:6px 24px">
-            <div class="you">code-review-graph status</div><div></div>
-            <div class="out">Nodes: <span class="ok">119</span></div>
-            <div class="out">Edges: <span class="ok">887</span></div>
-            <div class="out">Files: <span class="ok">27</span></div>
-            <div class="out">Languages: <span class="cm">js, vue, python, bash</span></div>
-          </div>
-          <div class="out cm" style="margin-top:6px"># cek dampak sebelum ubah fungsi inti</div>
-          <div class="you">code-review-graph detect-changes</div>
-        </div>
-      </div>
+      <figure class="frame" style="background:#0a1020">
+        <img src="assets/code-review.png" alt="Visualisasi graph code-review-graph" style="object-fit:contain" />
+        <figcaption>code-review-graph · graph dependensi (132 node · 902 edge) — telusur blast-radius sebelum ubah kode</figcaption>
+      </figure>
     </div>
   </section>
 

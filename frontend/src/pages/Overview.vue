@@ -141,7 +141,7 @@ const stats = computed(() => [
   { label: 'Kabupaten/Kota', value: statsData.value.total_kabkota || 0, icon: Building2, color: 'text-violet-500', sub: 'Tersebar di kabupaten/kota' },
   { label: 'Provinsi', value: statsData.value.total_provinsi || 0, icon: Globe, color: 'text-orange-500', sub: 'Provinsi di Indonesia' },
   { label: 'Kecamatan PD', value: statsData.value.total_kecamatan_pd || 0, icon: Users, color: 'text-rose-500', sub: 'Kecamatan dengan data PD' },
-  { label: 'Total Penerima', value: statsData.value.total_penerima || 0, icon: TrendingUp, color: 'text-cyan-500', sub: 'Sasaran KB–TK–SD–SMP–SMA' },
+  { label: 'Total Penerima', value: statsData.value.total_penerima || 0, icon: TrendingUp, color: 'text-cyan-500', sub: 'Sasaran KB–TK–SD' },
 ])
 
 const distribusiTop = computed(() =>

@@ -4,10 +4,10 @@ import { PORSI_PER_SPPG_PER_HARI, TIER_MERAH_MAX, TIER_KUNING_MAX, TIER_HIJAU_MA
 
 const router = Router()
 
-// Jumlah penerima sasaran per kecamatan: KB-TK-SD-SMP-SMA (sederajat).
-// PAUD (tk+kb+tpa+sps) + sd + smp + sma + smk. SLB di luar cakupan (bukan jenjang).
+// Jumlah penerima sasaran per kecamatan: KB-TK-SD (sederajat).
+// PAUD (tk+kb+tpa+sps) + sd. Jenjang SMP/SMA/SMK/SLB tidak dihitung.
 const COV = (alias) =>
-  `COALESCE(${alias}.tk_pd,0)+COALESCE(${alias}.kb_pd,0)+COALESCE(${alias}.tpa_pd,0)+COALESCE(${alias}.sps_pd,0)+COALESCE(${alias}.sd_pd,0)+COALESCE(${alias}.smp_pd,0)+COALESCE(${alias}.sma_pd,0)+COALESCE(${alias}.smk_pd,0)`
+  `COALESCE(${alias}.tk_pd,0)+COALESCE(${alias}.kb_pd,0)+COALESCE(${alias}.tpa_pd,0)+COALESCE(${alias}.sps_pd,0)+COALESCE(${alias}.sd_pd,0)`
 
 // Kapasitas porsi/hari dari jumlah SPPG.
 const KAPASITAS = (sppgExpr) => `(${sppgExpr} * ${PORSI_PER_SPPG_PER_HARI})`
