@@ -57,8 +57,8 @@
             <span class="font-semibold">{{ summary.total_kecamatan_pd }}</span>
           </div>
           <div class="flex items-center justify-between py-2 border-b border-slate-100">
-            <span class="text-sm text-slate-600">Total PAUD+SD (sasaran)</span>
-            <span class="font-semibold text-sky-700">{{ formatNum(summary.total_paud_sd) }}</span>
+            <span class="text-sm text-slate-600">Total penerima (sasaran)</span>
+            <span class="font-semibold text-sky-700">{{ formatNum(summary.total_penerima) }}</span>
           </div>
           <div class="flex items-center justify-between py-2">
             <span class="text-sm text-slate-600">Rata-rata coverage</span>
@@ -74,8 +74,9 @@
       <div class="md:col-span-2 stat-card bg-sky-50 border-sky-200">
         <p class="text-sm text-sky-800">
           <strong>Catatan:</strong> Data peserta didik bersumber dari DAPODIK.
-          Coverage dihitung sebagai perbandingan antara kapasitas SPPG (2.500 porsi/hari per SPPG)
-          dengan <strong>PAUD + SD</strong> (TK+KB+TPA+SPS+SD) per kecamatan.
+          Coverage dihitung sebagai perbandingan antara kapasitas SPPG (2.000 porsi/hari per SPPG)
+          dengan <strong>penerima sasaran</strong> KB–TK–SD–SMP–SMA sederajat
+          (TK+KB+TPA+SPS+SD+SMP+SMA+SMK) per kecamatan.
           Data bersifat sementara dan akan diperbarui secara berkala.
         </p>
       </div>
@@ -110,8 +111,8 @@ async function exportCSV(type) {
     if (type === 'kecamatan') {
       data = await fetch(`${API}/kecamatan`).then(r => r.json())
       filename = 'coverage-per-kecamatan.csv'
-      headers = ['Kode BPS', 'Kecamatan', 'Kabupaten/Kota', 'Provinsi', 'Jumlah SPPG', 'Kapasitas/Hari', 'PAUD+SD', 'Coverage (%)', 'Tier']
-      mapRow = (d) => [d.kode_kecamatan_bps, d.kecamatan, d.kabkota, d.provinsi, d.jumlah_sppg, d.kapasitas_porsi_per_hari, d.paud_sd_pd, d.coverage_persen ?? '', d.tier ?? '']
+      headers = ['Kode BPS', 'Kecamatan', 'Kabupaten/Kota', 'Provinsi', 'Jumlah SPPG', 'Kapasitas/Hari', 'Penerima', 'Coverage (%)', 'Tier']
+      mapRow = (d) => [d.kode_kecamatan_bps, d.kecamatan, d.kabkota, d.provinsi, d.jumlah_sppg, d.kapasitas_porsi_per_hari, d.penerima_pd, d.coverage_persen ?? '', d.tier ?? '']
     } else if (type === 'sppg') {
       const res = await fetch(`${API}/sppg?limit=50000`).then(r => r.json())
       data = res.data
@@ -121,8 +122,8 @@ async function exportCSV(type) {
     } else {
       data = await fetch(`${API}/peserta-didik`).then(r => r.json())
       filename = 'peserta-didik-per-kecamatan.csv'
-      headers = ['Kode Wilayah', 'Kecamatan', 'Kabupaten/Kota', 'Provinsi', 'PAUD+SD', 'SD', 'TK', 'KB', 'TPA', 'SPS', 'SMP', 'SMA']
-      mapRow = (d) => [d.kode_kecamatan, d.kecamatan, d.kabkota, d.provinsi, d.paud_sd_pd, d.sd_pd, d.tk_pd, d.kb_pd, d.tpa_pd, d.sps_pd, d.smp_pd, d.sma_pd]
+      headers = ['Kode Wilayah', 'Kecamatan', 'Kabupaten/Kota', 'Provinsi', 'Penerima', 'SD', 'TK', 'KB', 'TPA', 'SPS', 'SMP', 'SMA']
+      mapRow = (d) => [d.kode_kecamatan, d.kecamatan, d.kabkota, d.provinsi, d.penerima_pd, d.sd_pd, d.tk_pd, d.kb_pd, d.tpa_pd, d.sps_pd, d.smp_pd, d.sma_pd]
     }
 
     const csvContent = [

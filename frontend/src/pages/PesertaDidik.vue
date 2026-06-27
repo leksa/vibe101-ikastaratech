@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="page-title">Data Peserta Didik (Fokus PAUD + SD)</h2>
+    <h2 class="page-title">Data Peserta Didik (Sasaran KB–TK–SD–SMP–SMA)</h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
       <div class="stat-card">
@@ -8,16 +8,16 @@
         <p class="text-2xl font-bold text-slate-800">{{ kecamatanCount.toLocaleString('id-ID') }}</p>
       </div>
       <div class="stat-card border-l-4 border-sky-400">
-        <p class="text-sm text-slate-500">PAUD + SD</p>
+        <p class="text-sm text-slate-500">Penerima sasaran</p>
         <p class="text-2xl font-bold text-sky-600">{{ paudSdTotal.toLocaleString('id-ID') }}</p>
-        <p class="text-xs text-slate-400">Sasaran coverage</p>
+        <p class="text-xs text-slate-400">KB–TK–SD–SMP–SMA (sederajat)</p>
       </div>
       <div class="stat-card">
         <p class="text-sm text-slate-500">Total PD (semua jenjang)</p>
         <p class="text-2xl font-bold text-slate-800">{{ totalPd.toLocaleString('id-ID') }}</p>
       </div>
       <div class="stat-card">
-        <p class="text-sm text-slate-500">Rata-rata PAUD+SD/kec</p>
+        <p class="text-sm text-slate-500">Rata-rata penerima/kec</p>
         <p class="text-2xl font-bold text-slate-800">{{ avgPaudSd.toLocaleString('id-ID') }}</p>
       </div>
     </div>
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="text-xs text-slate-500 bg-amber-50 p-3 rounded-lg">
-          <strong>Fokus Coverage:</strong> PAUD (TK + KB + TPA + SPS) + SD — <strong>{{ paudSdTotal.toLocaleString('id-ID') }}</strong> siswa sasaran
+          <strong>Fokus Coverage:</strong> KB–TK–SD–SMP–SMA sederajat — PAUD (TK+KB+TPA+SPS) + SD + SMP + SMA + SMK — <strong>{{ paudSdTotal.toLocaleString('id-ID') }}</strong> siswa sasaran
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
             <tr>
               <th class="table-header">Kecamatan</th>
               <th class="table-header">Kab/Kota</th>
-              <th class="table-header text-right w-20">PAUD+SD</th>
+              <th class="table-header text-right w-20">Penerima</th>
               <th class="table-header text-right">SD</th>
               <th class="table-header text-right">TK</th>
               <th class="table-header text-right">KB</th>
@@ -60,7 +60,7 @@
             <tr v-for="row in allData" :key="row.kode_kecamatan" class="hover:bg-slate-50/50 transition-colors">
               <td class="table-cell font-medium">{{ cleanKec(row.kecamatan) }}</td>
               <td class="table-cell text-xs">{{ cleanKab(row.kabkota) }}</td>
-              <td class="table-cell text-right font-semibold text-sky-700">{{ formatNum(row.paud_sd_pd) }}</td>
+              <td class="table-cell text-right font-semibold text-sky-700">{{ formatNum(row.penerima_pd) }}</td>
               <td class="table-cell text-right">{{ formatNum(row.sd_pd) }}</td>
               <td class="table-cell text-right">{{ formatNum(row.tk_pd) }}</td>
               <td class="table-cell text-right">{{ formatNum(row.kb_pd) }}</td>
@@ -89,7 +89,7 @@ const loading = ref(true)
 
 const kecamatanCount = computed(() => allData.value.length)
 const totalPd = computed(() => allData.value.reduce((s, r) => s + (r.jumlah_peserta_didik || 0), 0))
-const paudSdTotal = computed(() => allData.value.reduce((s, r) => s + (r.paud_sd_pd || 0), 0))
+const paudSdTotal = computed(() => allData.value.reduce((s, r) => s + (r.penerima_pd || 0), 0))
 const avgPaudSd = computed(() => kecamatanCount.value > 0 ? Math.round(paudSdTotal.value / kecamatanCount.value) : 0)
 
 const jenjangData = computed(() => {

@@ -4,9 +4,10 @@ import { PORSI_PER_SPPG_PER_HARI, TIER_MERAH_MAX, TIER_KUNING_MAX, TIER_HIJAU_MA
 
 const router = Router()
 
-// Jumlah penerima sasaran (PAUD + SD) per kecamatan.
+// Jumlah penerima sasaran per kecamatan: KB-TK-SD-SMP-SMA (sederajat).
+// PAUD (tk+kb+tpa+sps) + sd + smp + sma + smk. SLB di luar cakupan (bukan jenjang).
 const COV = (alias) =>
-  `COALESCE(${alias}.sd_pd,0)+COALESCE(${alias}.tk_pd,0)+COALESCE(${alias}.kb_pd,0)+COALESCE(${alias}.tpa_pd,0)+COALESCE(${alias}.sps_pd,0)`
+  `COALESCE(${alias}.tk_pd,0)+COALESCE(${alias}.kb_pd,0)+COALESCE(${alias}.tpa_pd,0)+COALESCE(${alias}.sps_pd,0)+COALESCE(${alias}.sd_pd,0)+COALESCE(${alias}.smp_pd,0)+COALESCE(${alias}.sma_pd,0)+COALESCE(${alias}.smk_pd,0)`
 
 // Kapasitas porsi/hari dari jumlah SPPG.
 const KAPASITAS = (sppgExpr) => `(${sppgExpr} * ${PORSI_PER_SPPG_PER_HARI})`
@@ -47,7 +48,7 @@ router.get('/stats', async (req, res) => {
         (SELECT count(DISTINCT kabkota) FROM v_sppg) as total_kabkota,
         (SELECT count(DISTINCT provinsi) FROM v_sppg) as total_provinsi,
         (SELECT count(*) FROM (${V}) v WHERE EXISTS (SELECT 1 FROM kecamatan_mapping km WHERE km.kode_kecamatan_bps = v.kode_kecamatan_bps)) as total_kecamatan_pd,
-        (SELECT COALESCE(SUM(${COV('d')}),0) FROM (${DAPODIK_AGG}) d) as total_paud_sd
+        (SELECT COALESCE(SUM(${COV('d')}),0) FROM (${DAPODIK_AGG}) d) as total_penerima
     `)
     res.json(r.rows[0])
   } catch (err) {
@@ -101,7 +102,7 @@ router.get('/kecamatan', async (req, res) => {
         (SELECT kecamatan FROM v_sppg WHERE kode_kecamatan_bps = v.kode_kecamatan_bps LIMIT 1) as kecamatan,
         v.kabkota, v.provinsi, v.jumlah_sppg,
         ${KAPASITAS('v.jumlah_sppg')} as kapasitas_porsi_per_hari,
-        COALESCE(${COV('d')}, 0) as paud_sd_pd,
+        COALESCE(${COV('d')}, 0) as penerima_pd,
         kc.lat, kc.lon,
         CASE WHEN ${COV('d')} IS NULL OR ${COV('d')} = 0 THEN NULL
           WHEN ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} < ${TIER_MERAH_MAX} THEN 'merah'
@@ -125,7 +126,7 @@ router.get('/coverage', async (req, res) => {
   try {
     const r = await db.query(`
       WITH cov AS (
-        SELECT v.jumlah_sppg, ${COV('d')} as paud_sd_pd,
+        SELECT v.jumlah_sppg, ${COV('d')} as penerima_pd,
           ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} as pct
         FROM (${V}) v
         LEFT JOIN (${DAPODIK_AGG}) d ON v.kode_kecamatan_bps = d.kode_kecamatan_bps
@@ -150,7 +151,7 @@ router.get('/coverage/provinsi', async (req, res) => {
   try {
     const r = await db.query(`
       WITH cov AS (
-        SELECT v.provinsi, ${COV('d')} as paud_sd_pd,
+        SELECT v.provinsi, ${COV('d')} as penerima_pd,
           ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} as pct
         FROM (${V}) v
         LEFT JOIN (${DAPODIK_AGG}) d ON v.kode_kecamatan_bps = d.kode_kecamatan_bps
@@ -175,7 +176,7 @@ router.get('/coverage/kabkota', async (req, res) => {
   try {
     const r = await db.query(`
       WITH cov AS (
-        SELECT v.provinsi, v.kabkota, ${COV('d')} as paud_sd_pd,
+        SELECT v.provinsi, v.kabkota, ${COV('d')} as penerima_pd,
           ${COVERAGE_PCT('v.jumlah_sppg', COV('d'))} as pct
         FROM (${V}) v
         LEFT JOIN (${DAPODIK_AGG}) d ON v.kode_kecamatan_bps = d.kode_kecamatan_bps
@@ -205,7 +206,7 @@ router.get('/peserta-didik', async (req, res) => {
         d.total_pd as jumlah_peserta_didik,
         d.sd_pd, d.smp_pd, d.sma_pd, d.smk_pd, d.slb_pd,
         d.tk_pd, d.kb_pd, d.tpa_pd, d.sps_pd,
-        (${COV('d')}) as paud_sd_pd,
+        (${COV('d')}) as penerima_pd,
         COALESCE(s.jumlah_sppg, 0) as jumlah_sppg,
         kc.lat, kc.lon
       FROM dapodik_pd d

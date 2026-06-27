@@ -461,6 +461,64 @@
     </div>
   </section>
 
+  <!-- 8.5 — JOURNEY 05: Prompt explorer -->
+  <section class="slide" data-title="Prompt Explorer">
+    <div class="grow">
+      <div class="eyebrow">Perjalanan membangun · Tahap 05</div>
+      <h2><span class="num" style="font-size:2.4rem">05</span>&nbsp; Prompt explorer: konteks &amp; clarity</h2>
+      <p class="lead">Tidak ada satu cara benar. Terus belajar menakar <b style="color:var(--ink)">seberapa banyak konteks</b> yang dibutuhkan agent — disesuaikan dengan bobot tugas. Tiga model prompt yang sering dipakai:</p>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch">
+
+        <div class="card" style="display:flex; flex-direction:column">
+          <h3><span class="dot c"></span>1 · Lengkap &amp; presisi</h3>
+          <div class="covbar" style="height:6px; margin:6px 0 12px"><span class="lit-h"></span><span class="lit-h"></span><span class="lit-h"></span><span class="lit-h"></span></div>
+          <div class="term" style="flex:1">
+            <div class="body" style="font-size:.72rem; line-height:1.7">
+              <div class="out cm"># Objektif</div>
+              <div class="out">hasil akhir + batasan</div>
+              <div class="out cm"># Peran</div>
+              <div class="out">"kamu <span class="ok">expert</span> di bidang X"</div>
+              <div class="out cm"># Tahapan</div>
+              <div class="out">langkah presisi 1→n</div>
+              <div class="out cm"># Rules &amp; Larangan</div>
+              <div class="out">yang <span style="color:var(--merah)">tak boleh</span> dilakukan</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem; margin-top:12px"><b style="color:var(--clay-soft)">Kapan:</b> tugas besar, baru, kompleks, berisiko.</p>
+        </div>
+
+        <div class="card" style="display:flex; flex-direction:column">
+          <h3><span class="dot k"></span>2 · Menengah</h3>
+          <div class="covbar" style="height:6px; margin:6px 0 12px"><span class="lit-k"></span><span class="lit-k"></span><span style="background:var(--panel-2)"></span><span style="background:var(--panel-2)"></span></div>
+          <div class="term" style="flex:1">
+            <div class="body" style="font-size:.72rem; line-height:1.7">
+              <div class="you">Bangun X yang melakukan Y.</div>
+              <div class="out" style="margin-top:8px">1. tahap pertama</div>
+              <div class="out">2. tahap kedua</div>
+              <div class="out">3. hal yang perlu diperhatikan</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem; margin-top:12px"><b style="color:var(--clay-soft)">Kapan:</b> arah jelas, lingkup sedang, pola dikenal.</p>
+        </div>
+
+        <div class="card" style="display:flex; flex-direction:column">
+          <h3><span class="dot h"></span>3 · Ringkas</h3>
+          <div class="covbar" style="height:6px; margin:6px 0 12px"><span class="lit-h"></span><span style="background:var(--panel-2)"></span><span style="background:var(--panel-2)"></span><span style="background:var(--panel-2)"></span></div>
+          <div class="term" style="flex:1">
+            <div class="body" style="font-size:.72rem; line-height:1.7">
+              <div class="you">Perbaiki bug di /sppg.</div>
+              <div class="you" style="margin-top:6px">Tambah tombol export.</div>
+              <div class="you" style="margin-top:6px">Warnai header biru.</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem; margin-top:12px"><b style="color:var(--clay-soft)">Kapan:</b> fix, fitur kecil, styling sederhana.</p>
+        </div>
+
+      </div>
+      <p style="font-size:.84rem; color:var(--faint); margin-top:6px; font-family:var(--mono)">↳ Makin besar bobot &amp; risiko tugas → makin banyak konteks &amp; rules yang perlu diberi.</p>
+    </div>
+  </section>
+
   <!-- 9 — CLOSING 1 -->
   <section class="slide" data-title="Rangkuman">
     <div class="grow">

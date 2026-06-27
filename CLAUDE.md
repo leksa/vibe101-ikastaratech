@@ -1,7 +1,7 @@
 # data-bgn — Dashboard Coverage SPPG vs Penerima (DAPODIK)
 
 Dashboard untuk membandingkan jumlah **dapur SPPG** (Satuan Pelayanan Pemenuhan Gizi,
-program Makan Bergizi Gratis) dengan **populasi penerima** (peserta didik PAUD + SD dari
+program Makan Bergizi Gratis) dengan **populasi penerima** (peserta didik KB–TK–SD–SMP–SMA dari
 DAPODIK) per kecamatan, lalu menghitung **coverage** dan menandai tiap kecamatan
 merah / kuning / hijau di tabel dan peta.
 
@@ -77,8 +77,9 @@ Skema & view: `script/sql/setup_db.sql` → `02_clean_provinsi.sql` → `import_
 
 - **`PORSI_PER_SPPG_PER_HARI = 2000`** — satu SPPG diasumsikan melayani 2000 porsi/hari.
   Didefinisikan SEKALI di `backend/lib/coverage.js`; query SQL menirunya. Ubah di sana.
-- **coverage %** = `(jumlah_sppg * 2000) / penerima_paud_sd * 100`.
-  Penerima = `sd + tk + kb + tpa + sps`.
+- **coverage %** = `(jumlah_sppg * 2000) / penerima_pd * 100`.
+  Penerima sasaran (KB–TK–SD–SMP–SMA sederajat) = `tk + kb + tpa + sps + sd + smp + sma + smk`.
+  (SLB di luar cakupan.) Definisi tunggal: helper `COV` di `backend/api/routes.js`.
 - **tier** (4 tingkat): `< 70` merah · `70–89` kuning · `90–100` hijau_muda · `> 100` hijau_tua
   (`TIER_MERAH_MAX` / `TIER_KUNING_MAX` / `TIER_HIJAU_MAX`).
 - **`v_sppg`** = view SPPG yang sudah difilter ke 38 provinsi valid (`ref_provinsi`).
